@@ -1,4 +1,7 @@
 defmodule ExBanking do
+  @moduledoc """
+  Entrypoint for ExBanking application
+  """
   use Application
 
   alias ExBanking.{UserSupervisor, InputValidator, UserValidator, User}
@@ -129,7 +132,7 @@ defmodule ExBanking do
       {:ok, _} ->
         :ok
 
-      err ->
+      {:error, :too_many_requests_to_user} ->
         # If reversal was unsuccessful, wait a bit and try again
         :timer.sleep(100)
         revert_withdrawal(user, amount, currency)
