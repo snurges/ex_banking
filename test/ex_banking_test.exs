@@ -35,6 +35,16 @@ defmodule ExBankingTest do
     assert 100 == balance
   end
 
+  test "deposits money to user when that currency has already been deposited for" do
+    ExBanking.create_user("user")
+    ExBanking.deposit("user", 100, "EUR")
+
+    ExBanking.deposit("user", 50, "EUR")
+
+    {:ok, balance} = ExBanking.get_balance("user", "EUR")
+    assert 150 == balance
+  end
+
   test "does not allow to deposit negative amount" do
     ExBanking.create_user("user")
 
@@ -185,6 +195,7 @@ defmodule ExBankingTest do
     ExBanking.deposit("user_A", 10000, "EUR")
     ExBanking.deposit("user_B", 10000, "EUR")
 
+    # Send money from both user_A and user_B to user_C, so that sometimes user_C has too many requests and will fail
     transfers =
       Enum.map(1..200, fn i ->
         cond do
@@ -199,6 +210,7 @@ defmodule ExBankingTest do
     {:ok, user_C_balance} = ExBanking.get_balance("user_C", "EUR")
 
     assert true == Enum.member?(transfers, {:error, :too_many_requests_to_receiver})
+    # Make sure that total balances among all users is the same as was originally deposited to user_A and user_B
     assert user_A_balance + user_B_balance + user_C_balance == 20000
   end
 end
