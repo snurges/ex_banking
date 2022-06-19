@@ -1,4 +1,8 @@
-defmodule ExBanking.InputTypeValidator do
+defmodule ExBanking.InputValidator do
+  @moduledoc """
+  Makes sure that all arguments provided to ExBanking public functions have valid input
+  """
+
   def is_valid?({:create, user}) when is_bitstring(user), do: true
 
   def is_valid?({:deposit, user, amount, currency})

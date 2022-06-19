@@ -1,7 +1,7 @@
 defmodule ExBankingTest do
   use ExUnit.Case, async: true
 
-  setup context do
+  setup do
     Application.stop(:ex_banking)
     :ok = Application.start(:ex_banking)
   end
@@ -178,27 +178,27 @@ defmodule ExBankingTest do
   end
 
   test "amount of money incoming to the system should be equal to amount of money inside the system + amount of withdraws" do
-      ExBanking.create_user("user_A")
-      ExBanking.create_user("user_B")
-      ExBanking.create_user("user_C")
+    ExBanking.create_user("user_A")
+    ExBanking.create_user("user_B")
+    ExBanking.create_user("user_C")
 
-      ExBanking.deposit("user_A", 10000, "EUR")
-      ExBanking.deposit("user_B", 10000, "EUR")
+    ExBanking.deposit("user_A", 10000, "EUR")
+    ExBanking.deposit("user_B", 10000, "EUR")
 
-      transfers =
-        Enum.map(1..200, fn i ->
-          cond do
-            rem(i, 2) == 0 -> Task.async(fn -> ExBanking.send("user_A", "user_C", 100, "EUR") end)
-            rem(i, 2) == 1 -> Task.async(fn -> ExBanking.send("user_B", "user_C", 100, "EUR") end)
-          end
-        end)
-        |> Enum.map(&Task.await/1)
+    transfers =
+      Enum.map(1..200, fn i ->
+        cond do
+          rem(i, 2) == 0 -> Task.async(fn -> ExBanking.send("user_A", "user_C", 100, "EUR") end)
+          rem(i, 2) == 1 -> Task.async(fn -> ExBanking.send("user_B", "user_C", 100, "EUR") end)
+        end
+      end)
+      |> Enum.map(&Task.await/1)
 
-      {:ok, user_A_balance} = ExBanking.get_balance("user_A", "EUR")
-      {:ok, user_B_balance} = ExBanking.get_balance("user_B", "EUR")
-      {:ok, user_C_balance} = ExBanking.get_balance("user_C", "EUR")
+    {:ok, user_A_balance} = ExBanking.get_balance("user_A", "EUR")
+    {:ok, user_B_balance} = ExBanking.get_balance("user_B", "EUR")
+    {:ok, user_C_balance} = ExBanking.get_balance("user_C", "EUR")
 
-      assert true == Enum.member?(transfers, {:error, :too_many_requests_to_receiver})
-      assert user_A_balance + user_B_balance + user_C_balance == 20000
+    assert true == Enum.member?(transfers, {:error, :too_many_requests_to_receiver})
+    assert user_A_balance + user_B_balance + user_C_balance == 20000
   end
 end

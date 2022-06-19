@@ -4,6 +4,8 @@ defmodule ExBanking.User do
   @registry :user_registry
   @max_process_count 10
 
+  # API
+
   def start_link(name) do
     GenServer.start_link(__MODULE__, name, name: via_tuple(name))
   end
@@ -20,8 +22,10 @@ defmodule ExBanking.User do
     user |> via_tuple() |> GenServer.call({:get_balance, currency})
   end
 
+  # Callbacks
+
   @impl true
-  def init(name) do
+  def init(_name) do
     {:ok, %{}}
   end
 
@@ -63,7 +67,8 @@ defmodule ExBanking.User do
     end
   end
 
-  ## Private Functions
+  # Private Functions
+
   defp via_tuple(name),
     do: {:via, Registry, {@registry, name}}
 
